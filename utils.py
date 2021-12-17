@@ -73,8 +73,8 @@ def animate(pos, duration=3, max_frame_rate=60, save_to_path=None):
 
     fig, ax = plt.subplots()
 
-    ax.set_xlim(np.min(pos[:, 0, :]) * 0.97, np.max(pos[:, 0, :]) * 1.03)
-    ax.set_ylim(np.min(pos[:, 1, :]) * 0.97, np.max(pos[:, 1, :]) * 1.03)
+    ax.set_xlim(np.min(pos[:, 0, :]), np.max(pos[:, 0, :]))
+    ax.set_ylim(np.min(pos[:, 1, :]), np.max(pos[:, 1, :]))
     # ax.set_ylim(-1, 1)
     # ax.set_aspect("equal")
     ax.set_xlabel("$x$")
