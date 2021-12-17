@@ -48,10 +48,10 @@ def acc(masses, current_pos):
 
     result = np.zeros((len(masses), 2))
 
-    for i in range(len(masses)):
-        for j in range(len(masses)):
-            if i != j:
-                dist = current_pos[i, :] - current_pos[j, :]
-                result[i, :] -= masses[j] * dist * dist.dot(dist) ** -1.5
+    for m1 in range(len(masses)):
+        for m2 in range(len(masses)):
+            if m1 != m2:
+                dist = current_pos[m1, :] - current_pos[m2, :]
+                result[m1, :] -= masses[m2] * dist * dist.dot(dist) ** -1.5
 
     return result
