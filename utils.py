@@ -48,8 +48,8 @@ def solver(func):
         # axis 0 describes the masses
         # axis 1 describes the coordinates, i.e. 0 -> x, 1 -> y
         # axis 2 describes the time evolution of the coordinates
-        pos = np.zeros((len(init_pos), 2, time_steps))
-        vel = np.zeros((len(init_pos), 2, time_steps))
+        pos = np.zeros((len(masses), 2, time_steps))
+        vel = np.zeros((len(masses), 2, time_steps))
 
         pos[:, :, 0] = init_pos
         vel[:, :, 0] = init_vel
