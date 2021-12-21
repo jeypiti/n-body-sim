@@ -59,30 +59,50 @@ def solver(func):
     return wrapper
 
 
-def animate(pos, duration=3, max_frame_rate=60, save_to_path=None):
+def animate(masses, pos, vel, times, duration=3, max_frame_rate=60, save_to_path=None):
     """
     Produces an animation of a given array of positions.
     Optionally saves the animation to a video file if a path is specified.
 
+    :param masses: Array of masses.
     :param pos: Array of positions over time.
+    :param vel: Array of velocities over time.
+    :param times: Array of time values.
     :param duration: Duration of the animation in seconds.
     :param max_frame_rate: Maximum frame rate at which the animation
                            should be displayed or saved.
     :param save_to_path: If given, saves the animation to this file path.
     """
 
-    fig, ax = plt.subplots()
+    fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(13, 5), tight_layout=True)
+    times = times / times[-1]  # map time to interval [0, 1]
 
-    ax.set_xlim(np.min(pos[:, 0, :]), np.max(pos[:, 0, :]))
-    ax.set_ylim(np.min(pos[:, 1, :]), np.max(pos[:, 1, :]))
-    # ax.set_ylim(-1, 1)
-    # ax.set_aspect("equal")
-    ax.set_xlabel("$x$")
-    ax.set_ylabel("$y$")
+    # prepare a list of artists for animation
+    bodies = [ax1.plot([], [], marker="o")[0] for _ in range(len(masses))]
+    energy_points = [ax2.plot([], [], marker=".")[0] for _ in range(3)]
 
-    # prepare a list of bodies for animation
-    points = [ax.plot([], [], marker="o")[0] for _ in range(pos.shape[0])]
+    # N body visualization
+    ax1.set_xlim(np.min(pos[:, 0, :]), np.max(pos[:, 0, :]))
+    ax1.set_ylim(np.min(pos[:, 1, :]), np.max(pos[:, 1, :]))
+    # ax1.set_ylim(-1, 1)
+    # ax1.set_aspect("equal")
+    ax1.set_xlabel(r"$x\,/\,\mathrm{a.u.}$")
+    ax1.set_ylabel(r"$y\,/\,\mathrm{a.u.}$")
 
+    # energy plot
+    pot_energy, kin_energy, tot_energy = calculate_energy(masses, pos, vel)
+
+    plt.gca().set_prop_cycle(None)  # reset color cycle
+    ax2.plot(times, pot_energy, label=r"$E_\mathrm{pot}$")
+    ax2.plot(times, kin_energy, label=r"$E_\mathrm{kin}$")
+    ax2.plot(times, tot_energy, label=r"$E_\mathrm{tot}$")
+
+    ax2.set_xlim(0, 1)
+    ax2.set_xlabel(r"$t\,/\,\mathrm{a.u.}$")
+    ax2.set_ylabel(r"$E\,/\,\mathrm{a.u.}$")
+    ax2.legend()
+
+    # generate animation
     frame_count = int(min(pos.shape[2], duration * max_frame_rate))
     frame_step = pos.shape[2] / frame_count
     frame_rate = frame_count / duration
@@ -95,10 +115,17 @@ def animate(pos, duration=3, max_frame_rate=60, save_to_path=None):
     )
 
     def get_frame(frame_idx):
-        for mass_idx, point in enumerate(points):
-            point.set_data(pos[mass_idx, :, int(frame_idx * frame_step)])
+        time_idx = int(frame_idx * frame_step)
 
-        return points
+        # update bodies
+        for mass_idx, body in enumerate(bodies):
+            body.set_data(pos[mass_idx, :, time_idx])
+
+        # update energy plots
+        for point, energy in zip(energy_points, (pot_energy, kin_energy, tot_energy)):
+            point.set_data(times[time_idx], energy[time_idx])
+
+        return bodies + energy_points
 
     anim = animation(fig, get_frame, frame_count, blit=True, interval=frame_time)
 
@@ -109,3 +136,33 @@ def animate(pos, duration=3, max_frame_rate=60, save_to_path=None):
         print(f"Render took {end - start:.3f} s")
     else:
         plt.show()
+
+
+def calculate_energy(masses, pos, vel):
+    """
+    Calculates kinetic energy, gravitational potential energy, and
+    total energy for the whole system for each time step in the simulation.
+
+    :param masses: Array of masses.
+    :param pos: Array of positions over time.
+    :param vel: Array of velocities over time.
+    :return: Tuple of kinetic energy over time, potential
+             energy over time, and total energy over time.
+    """
+
+    time_steps = pos.shape[2]
+    pot_energy = np.zeros(time_steps)
+    kin_energy = np.zeros(time_steps)
+
+    for time_idx in range(time_steps):
+        kin_energy[time_idx] = 0.5 * np.sum(masses * np.sum(vel[:, :, time_idx] ** 2, axis=1))
+
+        for m1 in range(len(masses) - 1):
+            for m2 in range(m1 + 1, len(masses)):
+                pot_energy[time_idx] -= (
+                    masses[m1]
+                    * masses[m2]
+                    / np.linalg.norm(pos[m1, :, time_idx] - pos[m2, :, time_idx])
+                )
+
+    return pot_energy, kin_energy, pot_energy + kin_energy

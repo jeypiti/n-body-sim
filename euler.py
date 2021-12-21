@@ -32,7 +32,7 @@ def solve(masses, pos, vel, dt):
         pos[:, :, time_idx + 1] = pos[:, :, time_idx] + dt * vel[:, :, time_idx]
         vel[:, :, time_idx + 1] = vel[:, :, time_idx] + dt * acc(masses, pos[:, :, time_idx])
 
-    return pos
+    return pos, vel
 
 
 def acc(masses, current_pos):
