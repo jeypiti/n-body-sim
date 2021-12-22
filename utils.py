@@ -6,6 +6,7 @@ File holding various utilities.
 from functools import wraps
 from time import perf_counter
 
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.animation import FuncAnimation as animation
@@ -15,6 +16,10 @@ __author__ = "jeypiti"
 __copyright__ = "Copyright 2021, jeypiti"
 __credits__ = ["jeypiti"]
 __license__ = "MIT"
+
+
+mpl.rcParams["mathtext.fontset"] = "cm"
+mpl.rcParams["font.sans-serif"] = "Latin Modern Roman"
 
 
 def solver(func):
@@ -82,8 +87,16 @@ def animate(masses, pos, vel, times, duration=3, max_frame_rate=60, save_to_path
     energy_points = [ax2.plot([], [], marker=".")[0] for _ in range(3)]
 
     # N body visualization
-    ax1.set_xlim(np.min(pos[:, 0, :]), np.max(pos[:, 0, :]))
-    ax1.set_ylim(np.min(pos[:, 1, :]), np.max(pos[:, 1, :]))
+    pad = 0.03
+
+    x_min, x_max = np.min(pos[:, 0, :]), np.max(pos[:, 0, :])
+    x_range = x_max - x_min
+    ax1.set_xlim(x_min - pad * x_range, x_max + pad * x_range)
+
+    y_min, y_max = np.min(pos[:, 1, :]), np.max(pos[:, 1, :])
+    y_range = y_max - y_min
+    ax1.set_ylim(y_min - pad * y_range, y_max + pad * y_range)
+
     # ax1.set_ylim(-1, 1)
     # ax1.set_aspect("equal")
     ax1.set_xlabel(r"$x\,/\,\mathrm{a.u.}$")
