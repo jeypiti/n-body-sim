@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""n-body-sim: /utils
+"""n-body-sim: src/utils
 File holding various utilities.
 """
 from functools import wraps

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""n-body-sim: /simulation
+"""n-body-sim: src/simulation
 Main file of the simulation. Sets up integration method, initial conditions,
 and time steps. Integrates N body problem and displays animation.
 """
@@ -8,7 +8,7 @@ from time import perf_counter
 
 import numpy as np
 
-import euler
+import forward_euler
 from utils import animate
 
 
@@ -29,7 +29,7 @@ pos = np.array([[5, -1], [0, 0], [2, 5]])
 vel = np.array([[0, 0], [0, 0], [0, 0]])
 
 start = perf_counter()
-pos, vel = euler.solve(masses, pos, vel, time_steps, dt)
+pos, vel = forward_euler.solve(masses, pos, vel, time_steps, dt)
 end = perf_counter()
 print(f"Computation for {time_steps} time steps took {end - start:.3f}s")
 
