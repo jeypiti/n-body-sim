@@ -32,7 +32,7 @@ def solver(func):
     """
 
     @wraps(func)
-    def wrapper(masses, init_pos, init_vel, time_steps, dt):
+    def wrapper(masses, init_pos, init_vel, time_steps, dt, acc_func):
 
         if not init_pos.shape[0] == init_vel.shape[0] == len(masses):
             raise ValueError(
@@ -59,7 +59,7 @@ def solver(func):
         pos[:, :, 0] = init_pos
         vel[:, :, 0] = init_vel
 
-        return func(masses, pos, vel, dt)
+        return func(masses, pos, vel, dt, acc_func)
 
     return wrapper
 
