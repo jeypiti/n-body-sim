@@ -15,7 +15,7 @@ __license__ = "MIT"
 
 
 @solver
-def solve(masses, pos, vel, dt):
+def forward_euler(masses, pos, vel, dt):
     """
     Solves N body simulation using the forward Euler method.
 

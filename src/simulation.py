@@ -8,7 +8,7 @@ from time import perf_counter
 
 import numpy as np
 
-import forward_euler
+import integrators
 from utils import animate
 
 
@@ -29,7 +29,7 @@ pos = np.array([[5, -1], [0, 0], [2, 5]])
 vel = np.array([[0, 0], [0, 0], [0, 0]])
 
 start = perf_counter()
-pos, vel = forward_euler.solve(masses, pos, vel, time_steps, dt)
+pos, vel = integrators.forward_euler(masses, pos, vel, time_steps, dt)
 end = perf_counter()
 print(f"Computation for {time_steps} time steps took {end - start:.3f}s")
 
