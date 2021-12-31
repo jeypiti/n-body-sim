@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""n-body-sim: src/forward_euler
+"""n-body-sim: src/integrators
 Implementation of a solver that uses the forward Euler method.
 """
 import numpy as np
