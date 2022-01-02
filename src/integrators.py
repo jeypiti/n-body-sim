@@ -36,4 +36,14 @@ def forward_euler(masses, pos, vel, dt, acc_func):
     return pos, vel
 
 
+@solver
+def leapfrog(masses, pos, vel, dt, acc_func):
+    for time_idx in range(pos.shape[2] - 1):
+        #1/2 Drift:
+        pos[:, :, time_idx + 1] = pos[:, :, time_idx] + 0.5 * dt * vel[:, :, time_idx]
+        #1 Kick:
+        vel[:, :, time_idx + 1] = vel[:, :, time_idx] + dt * acc_func(masses, pos[:, :, time_idx + 1])
+        #1/2 Drift:
+        pos[:, :, time_idx + 1] = pos[:, :, time_idx + 1] + 0.5 * dt * vel[:, :, time_idx + 1]
 
+    return pos, vel
