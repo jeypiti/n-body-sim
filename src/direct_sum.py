@@ -18,9 +18,9 @@ def acceleration(masses, current_pos):
     Calculates the acceleration for each body in both x & y direction
     based on the gravitational force using the direct sum approach.
 
-    :param masses: List of N masses.
-    :param current_pos: List of current positions of N bodies.
-    :return: An (N, 2) array of accelerations.
+    :param masses: A (N,) array of masses.
+    :param current_pos: A (N, 2) array of current positions of all bodies.
+    :return: A (N, 2) array of accelerations.
     """
 
     result = np.zeros((len(masses), 2))
