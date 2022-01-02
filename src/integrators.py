@@ -6,9 +6,9 @@ Implementations of different integration methods.
 from utils import solver
 
 
-__author__ = "jeypiti"
-__copyright__ = "Copyright 2021, jeypiti"
-__credits__ = ["jeypiti"]
+__author__ = "jeypiti, Lvisss"
+__copyright__ = "Copyright 2021, jeypiti, Lvisss"
+__credits__ = ["jeypiti", "Lvisss"]
 __license__ = "MIT"
 
 
