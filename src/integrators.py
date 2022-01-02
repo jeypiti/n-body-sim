@@ -13,7 +13,7 @@ __license__ = "MIT"
 
 
 @solver
-def forward_euler(masses, pos, vel, dt, acc_func):
+def forward_euler(masses, pos, vel, dt, acc):
     """
     Solves N body simulation using the forward Euler method.
 
@@ -23,21 +23,21 @@ def forward_euler(masses, pos, vel, dt, acc_func):
     :param vel: Nearly empty list for time evolution of x & y velocities for N bodies.
                 Only initial conditions should be specified.
     :param dt: Time step for the simulation.
-    :param acc_func: Callable that calculates the acceleration acting on the bodies.
-                     Takes an (N,) array of masses and an (N, 2) array of current
-                     positions. Returns an (N, 2) array of accelerations.
+    :param acc: Callable that calculates the acceleration acting on the bodies.
+                Takes an (N,) array of masses and an (N, 2) array of current
+                positions. Returns an (N, 2) array of accelerations.
     :return: Time evolution of x & y coordinates for N bodies.
     """
 
     for time_idx in range(pos.shape[2] - 1):
         pos[:, :, time_idx + 1] = pos[:, :, time_idx] + dt * vel[:, :, time_idx]
-        vel[:, :, time_idx + 1] = vel[:, :, time_idx] + dt * acc_func(masses, pos[:, :, time_idx])
+        vel[:, :, time_idx + 1] = vel[:, :, time_idx] + dt * acc(masses, pos[:, :, time_idx])
 
     return pos, vel
 
 
 @solver
-def leapfrog(masses, pos, vel, dt, acc_func):
+def leapfrog(masses, pos, vel, dt, acc):
     """
     Solves N body simulation using the leapfrog method.
 
@@ -47,9 +47,9 @@ def leapfrog(masses, pos, vel, dt, acc_func):
     :param vel: Nearly empty list for time evolution of x & y velocities for N bodies.
                 Only initial conditions should be specified.
     :param dt: Time step for the simulation.
-    :param acc_func: Callable that calculates the acceleration acting on the bodies.
-                     Takes an (N,) array of masses and an (N, 2) array of current
-                     positions. Returns an (N, 2) array of accelerations.
+    :param acc: Callable that calculates the acceleration acting on the bodies.
+                Takes an (N,) array of masses and an (N, 2) array of current
+                positions. Returns an (N, 2) array of accelerations.
     :return: Time evolution of x & y coordinates for N bodies.
     """
 
@@ -58,7 +58,7 @@ def leapfrog(masses, pos, vel, dt, acc_func):
         pos[:, :, time_idx + 1] = pos[:, :, time_idx] + 0.5 * dt * vel[:, :, time_idx]
 
         # use 1/2 drift step for full kick step
-        vel[:, :, time_idx + 1] = vel[:, :, time_idx] + dt * acc_func(masses, pos[:, :, time_idx + 1])
+        vel[:, :, time_idx + 1] = vel[:, :, time_idx] + dt * acc(masses, pos[:, :, time_idx + 1])
 
         # another 1/2 drift
         pos[:, :, time_idx + 1] = pos[:, :, time_idx + 1] + 0.5 * dt * vel[:, :, time_idx + 1]
