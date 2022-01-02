@@ -15,7 +15,7 @@ __license__ = "MIT"
 
 def acceleration(masses, current_pos):
     """
-    Calculate the acceleration for each body in both x & y direction
+    Calculates the acceleration for each body in both x & y direction
     based on the gravitational force using the direct sum approach.
 
     :param masses: List of N masses.
