@@ -12,7 +12,7 @@ __credits__ = ["jeypiti"]
 __license__ = "MIT"
 
 
-# see acceleration function below
+# see `acceleration` function below
 positions = np.empty(1)
 masses = np.empty(1)
 
@@ -147,6 +147,19 @@ class Quad:
 
 
 def _calculate_acceleration(quad, body_idx, theta):
+    """
+    Internal function used to calculate the acceleration of a particular body
+    caused by the specified quadrant in both x & y direction based on the
+    gravitational force using the Barnes-Hut algorithm.
+
+    :param quad: Acceleration is calculated based on the
+                 bodies contain within this quadrant.
+    :param body_idx: Index of the body of which the
+                     acceleration will be calculated.
+    :param theta: See `acceleration` function below.
+    :return: A (2,) array containing the acceleration on the specified body.
+    """
+
     dist = quad.center_of_mass - positions[body_idx]
     norm_sq = dist.dot(dist)
 
@@ -186,7 +199,10 @@ def acceleration(m, current_pos, theta=0.5):
     :param theta: Threshold value used by the Barnes-Hut algorithm to determine
                   if a quad is sufficiently far away or sufficiently close to a
                   reference body. Based on the result, the quad may be
-                  approximated as a single body or be traversed to a deeper level.
+                  approximated as a single body or be traversed to a deeper
+                  level. If theta is equal to 0, the scheme is equivalent to a
+                  direct sum approach as no internal quad will be approximated
+                  as a single body.
     :return: A (N, 2) array of accelerations.
     """
 
