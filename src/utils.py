@@ -79,6 +79,7 @@ def animate(masses, pos, vel, times, duration=3, max_frame_rate=60, save_to_path
     :param save_to_path: If given, saves the animation to this file path.
     """
 
+    start = perf_counter()
     fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(13, 5), tight_layout=True)
     times = times / times[-1]  # map time to interval [0, 1]
 
@@ -141,6 +142,9 @@ def animate(masses, pos, vel, times, duration=3, max_frame_rate=60, save_to_path
         return bodies + energy_points
 
     anim = animation(fig, get_frame, frame_count, blit=True, interval=frame_time)
+
+    end = perf_counter()
+    print(f"Generating the animation took {end - start:.3f} s")
 
     if save_to_path:
         start = perf_counter()
