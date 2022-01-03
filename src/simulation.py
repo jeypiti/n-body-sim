@@ -39,6 +39,6 @@ pos, vel = integrators.forward_euler(
     direct_sum.acceleration,
 )
 end = perf_counter()
-print(f"Computation for {time_steps} time steps took {end - start:.3f}s")
+print(f"Computation for {len(masses)} bodies and {time_steps} time steps took {end - start:.3f}s")
 
 animate(masses, pos, vel, t, duration=1)
