@@ -20,7 +20,7 @@ __credits__ = ["jeypiti"]
 __license__ = "MIT"
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     time_steps = 1000
     t_end = 10
     t, dt = np.linspace(0, t_end, num=time_steps, retstep=True)
@@ -41,6 +41,8 @@ if __name__ == '__main__':
         direct_sum.acceleration_vec,
     )
     end = perf_counter()
-    print(f"Computation for {len(masses)} bodies and {time_steps} time steps took {end - start:.3f} s")
+    print(
+        f"Computation for {len(masses)} bodies and {time_steps} time steps took {end - start:.3f} s"
+    )
 
     animate(masses, pos, vel, t)
