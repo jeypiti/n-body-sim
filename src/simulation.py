@@ -41,6 +41,6 @@ if __name__ == '__main__':
         direct_sum.acceleration_vec,
     )
     end = perf_counter()
-    print(f"Computation for {len(masses)} bodies and {time_steps} time steps took {end - start:.3f}s")
+    print(f"Computation for {len(masses)} bodies and {time_steps} time steps took {end - start:.3f} s")
 
     animate(masses, pos, vel, t)
