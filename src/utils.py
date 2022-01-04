@@ -88,7 +88,7 @@ def animate(masses, pos, vel, times, duration=3, max_frame_rate=60, save_to_path
     energy_points = [ax2.plot([], [], marker=".")[0] for _ in range(3)]
 
     # N body visualization
-    pad = 0.03
+    pad = 0.03  # padding of the plot as a percentage of the maximum extent of the simulation
 
     x_min, x_max = np.min(pos[:, 0, :]), np.max(pos[:, 0, :])
     x_range = x_max - x_min
