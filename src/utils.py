@@ -3,7 +3,8 @@
 """n-body-sim: src/utils
 File holding various utilities.
 """
-from functools import wraps
+from functools import partial, wraps
+from multiprocessing import Pool
 from time import perf_counter
 
 import matplotlib as mpl
@@ -104,11 +105,11 @@ def animate(masses, pos, vel, times, duration=3, max_frame_rate=60, save_to_path
     ax1.set_ylabel(r"$y\,/\,\mathrm{a.u.}$")
 
     # energy plot
-    pot_energy, kin_energy, tot_energy = calculate_energy(masses, pos, vel)
+    kin_energy, pot_energy, tot_energy = calculate_energy(masses, pos, vel)
 
     plt.gca().set_prop_cycle(None)  # reset color cycle
-    ax2.plot(times, pot_energy, label=r"$E_\mathrm{pot}$")
     ax2.plot(times, kin_energy, label=r"$E_\mathrm{kin}$")
+    ax2.plot(times, pot_energy, label=r"$E_\mathrm{pot}$")
     ax2.plot(times, tot_energy, label=r"$E_\mathrm{tot}$")
 
     ax2.set_xlim(0, 1)
@@ -136,7 +137,7 @@ def animate(masses, pos, vel, times, duration=3, max_frame_rate=60, save_to_path
             body.set_data(pos[mass_idx, :, time_idx])
 
         # update energy plots
-        for point, energy in zip(energy_points, (pot_energy, kin_energy, tot_energy)):
+        for point, energy in zip(energy_points, (kin_energy, pot_energy, tot_energy)):
             point.set_data(times[time_idx], energy[time_idx])
 
         return bodies + energy_points
@@ -155,6 +156,47 @@ def animate(masses, pos, vel, times, duration=3, max_frame_rate=60, save_to_path
         plt.show()
 
 
+def _get_energy_at_time(masses, pos, vel, time_idx):
+    """
+    Internal function used to calculate kinetic energy and potential energy at
+    a give time index using a vectorized direct sum approach. This function is
+    necessary to facilitate the parallelization of the energy calculation
+    across multiple CPU cores.
+
+    :param masses: Array of masses.
+    :param pos: Array of positions over time.
+    :param vel: Array of velocities over time.
+    :param time_idx: Time index at which the energy is to be calculated.
+    :return: Tuple of kinetic energy and potential energy
+             at the give time index.
+    """
+
+    # kinetic energy
+    kin_energy = 0.5 * np.sum(masses * np.sum(vel[:, :, time_idx] ** 2, axis=1))
+
+    # potential energy
+    # extract x & y coordinates to a (N, 1) array
+    x = pos[:, 0:1, time_idx]
+    y = pos[:, 1:2, time_idx]
+
+    # matrices that store pairwise body distances
+    dx = x.T - x
+    dy = y.T - y
+
+    # calculate pairwise inverse norm of distances
+    # mask operation to avoid divide by zero
+    norm = np.sqrt(dx ** 2 + dy ** 2)
+    inv = np.divide(1, norm, where=norm != 0)
+
+    # multiply matrix element ij with the masses of bodies i and j
+    energy_per_body = np.transpose(inv * masses) * masses
+
+    # sum energies
+    pot_energy = -0.5 * energy_per_body.sum()
+
+    return kin_energy, pot_energy
+
+
 def calculate_energy(masses, pos, vel):
     """
     Calculates kinetic energy, gravitational potential energy, and
@@ -167,19 +209,16 @@ def calculate_energy(masses, pos, vel):
              energy over time, and total energy over time.
     """
 
-    time_steps = pos.shape[2]
-    pot_energy = np.zeros(time_steps)
-    kin_energy = np.zeros(time_steps)
+    with Pool() as pool:
+        # distribute calculations across all CPU threads
+        result = pool.map(
+            partial(_get_energy_at_time, masses, pos, vel),
+            range(pos.shape[2]),
+        )
 
-    for time_idx in range(time_steps):
-        kin_energy[time_idx] = 0.5 * np.sum(masses * np.sum(vel[:, :, time_idx] ** 2, axis=1))
+    # convert result to NumPy array and extract kinetic and potential energy
+    result = np.array(result)
+    kin_energy = result[:, 0]
+    pot_energy = result[:, 1]
 
-        for m1 in range(len(masses) - 1):
-            for m2 in range(m1 + 1, len(masses)):
-                pot_energy[time_idx] -= (
-                    masses[m1]
-                    * masses[m2]
-                    / np.linalg.norm(pos[m1, :, time_idx] - pos[m2, :, time_idx])
-                )
-
-    return pot_energy, kin_energy, pot_energy + kin_energy
+    return kin_energy, pot_energy, kin_energy + pot_energy
