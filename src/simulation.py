@@ -42,7 +42,7 @@ if __name__ == "__main__":
     )
     end = perf_counter()
     print(
-        f"Computation for {len(masses)} bodies and {time_steps} time steps took {end - start:.3f} s"
+        f"Computation for {len(masses)} bodies and {time_steps:,} time steps took {end - start:,.3f} s"
     )
 
     animate(masses, pos, vel, t)

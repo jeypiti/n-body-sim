@@ -126,7 +126,7 @@ def animate(masses, pos, vel, times, duration=3, max_frame_rate=60, save_to_path
     print(
         f"Rendering {frame_count * frame_time / 1000:.1f}s animation @ {frame_rate:.1f} FPS"
         f" ({frame_time:.1f} ms per frame)\nShowing {frame_count} frames from a total of"
-        f" {pos.shape[2]} time steps (one frame every {frame_step:.1f} steps)"
+        f" {pos.shape[2]:,} time steps (one frame every {frame_step:,.1f} steps)"
     )
 
     def get_frame(frame_idx):
