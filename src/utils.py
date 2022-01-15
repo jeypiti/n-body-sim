@@ -202,7 +202,8 @@ def _get_energy_at_time(masses, pos, vel, time_idx):
     # calculate pairwise inverse norm of distances
     # mask operation to avoid divide by zero
     norm = np.sqrt(dx ** 2 + dy ** 2)
-    inv = np.divide(1, norm, where=norm != 0)
+    inv = np.zeros_like(norm)  # ensure that diagonal of inv will only contain zeros
+    np.divide(1, norm, where=norm != 0, out=inv)
 
     # multiply matrix element ij with the masses of bodies i and j
     energy_per_body = np.transpose(inv * masses) * masses
