@@ -138,7 +138,7 @@ class Quad:
 
         # create new sub-quad if it doesn't exist
         if self.children[sub_quad_idx] is None:
-            new_x = self.x + self.radius * sub_quad_idx % 2
+            new_x = self.x + self.radius * (sub_quad_idx % 2)
             new_y = self.y + self.radius * (1 if sub_quad_idx >= 2 else 0)
 
             self.children[sub_quad_idx] = Quad(new_x, new_y, self.radius)
