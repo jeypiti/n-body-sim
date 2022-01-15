@@ -148,8 +148,6 @@ def animate(masses, pos, vel, times, duration=3, max_frame_rate=60, save_to_path
         anim_tot[frame_idx] = tot_energy[lower_idx] * (1 - f) + tot_energy[lower_idx + 1] * f
 
     def get_frame(frame_idx):
-        time_idx = int(frame_idx * frame_step)
-
         # update bodies
         for mass_idx, body in enumerate(bodies):
             body.set_data(anim_pos[mass_idx, :, frame_idx])
