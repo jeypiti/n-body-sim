@@ -118,3 +118,42 @@ figure_eight = (
 )
 
 random_planetary_system = generate_planetary_system(20, seed=31415)
+
+# periodic initial conditions by:
+# Xiaoming Li, Yipeng Jing, Shijun Liao. "The 1223 new periodic orbits of
+# planar three-body problem with unequal mass and zero angular momentum". 2017.
+three_body_periodic1 = (
+    np.array((1.0, 1.0, 0.5)),
+    np.array(
+        (
+            (-1.0, 0.0),
+            (1.0, 0.0),
+            (0.0, 0.0),
+        )
+    ),
+    np.array(
+        (
+            (0.2009656237, 0.2431076328),
+            (0.2009656237, 0.2431076328),
+            (-4 * 0.2009656237, -4 * 0.2431076328),
+        )
+    ),
+)
+
+three_body_periodic2 = (
+    np.array((1.0, 1.0, 2.0)),
+    np.array(
+        (
+            (-1.0, 0.0),
+            (1.0, 0.0),
+            (0.0, 0.0),
+        )
+    ),
+    np.array(
+        (
+            (0.6649107583, 0.8324167864),
+            (0.6649107583, 0.8324167864),
+            (-0.6649107583, -0.8324167864),
+        )
+    ),
+)
