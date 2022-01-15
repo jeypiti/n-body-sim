@@ -22,6 +22,42 @@ neptune = 1.02413e26
 uranus = 8.6810e25
 pluto = 1.303e22
 
+
+def generate_planetary_system(bodies, max_mass=1e-3, seed=None):
+    """
+    Randomly generates initial conditions for a planetary system. Depending on
+    the exact starting positions, numerical errors in the simulation may lead
+    to problems, e.g. bodies being ejected from the system. The chance of this
+    happening increases with the number of bodies in the system.
+    The system will be spinning anticlockwise.
+
+    :param bodies: Number of bodies in the system.
+    :param max_mass: Maximum mass of the outer bodies. The central body has mass 1.
+    :param seed: Seed for the pseudorandom number generator.
+    :return: Vales for (n,) masses, (n, 2) positions, and (n, 2) velocities.
+    """
+
+    rng = np.random.default_rng(seed)
+
+    masses = rng.uniform(0, max_mass, (bodies,))
+
+    # generate polar coordinates & convert to cartesian
+    theta = rng.uniform(0, 2 * np.pi, (bodies,))
+    r = rng.gamma(7.5, 1, (bodies,)) * bodies ** 0.8
+    pos = np.vstack((r * np.cos(theta), r * np.sin(theta))).T
+
+    # calculate magnitude of velocity under the approximation of a two-body system
+    v = np.sqrt(1 / r)
+
+    vel = np.vstack((-v * np.sin(theta), v * np.cos(theta))).T
+
+    # overwrite first body with heavy central mass
+    masses[0] = 1
+    pos[0, :] = vel[0, :] = 0
+
+    return masses, pos, vel
+
+
 # modeled after our solar system
 solar_system = (
     np.array((solar, mercury, venus, earth, mars, jupiter, saturn, uranus, pluto)) / solar,
@@ -80,3 +116,5 @@ figure_eight = (
         )
     ),
 )
+
+random_planetary_system = generate_planetary_system(20, seed=31415)
