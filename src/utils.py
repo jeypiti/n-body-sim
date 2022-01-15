@@ -81,6 +81,8 @@ def animate(masses, pos, vel, times, duration=3, max_frame_rate=60, save_to_path
     """
 
     start = perf_counter()
+
+    # initialize figures
     fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(13, 5), tight_layout=True)
     times = times / times[-1]  # map time to interval [0, 1]
 
@@ -88,7 +90,7 @@ def animate(masses, pos, vel, times, duration=3, max_frame_rate=60, save_to_path
     bodies = [ax1.plot([], [], marker="o")[0] for _ in range(len(masses))]
     energy_points = [ax2.plot([], [], marker=".")[0] for _ in range(3)]
 
-    # N body visualization
+    # appropriately format body figure
     pad = 0.03  # padding of the plot as a percentage of the maximum extent of the simulation
 
     x_min, x_max = np.min(pos[:, 0, :]), np.max(pos[:, 0, :])
@@ -99,12 +101,10 @@ def animate(masses, pos, vel, times, duration=3, max_frame_rate=60, save_to_path
     y_range = y_max - y_min
     ax1.set_ylim(y_min - pad * y_range, y_max + pad * y_range)
 
-    # ax1.set_ylim(-1, 1)
-    # ax1.set_aspect("equal")
     ax1.set_xlabel(r"$x\,/\,\mathrm{a.u.}$")
     ax1.set_ylabel(r"$y\,/\,\mathrm{a.u.}$")
 
-    # energy plot
+    # prepare energy figure
     kin_energy, pot_energy, tot_energy = calculate_energy(masses, pos, vel)
 
     plt.gca().set_prop_cycle(None)  # reset color cycle
@@ -117,7 +117,7 @@ def animate(masses, pos, vel, times, duration=3, max_frame_rate=60, save_to_path
     ax2.set_ylabel(r"$E\,/\,\mathrm{a.u.}$")
     ax2.legend()
 
-    # generate animation
+    # calculate animation parameters
     frame_count = int(min(pos.shape[2], duration * max_frame_rate))
     frame_step = pos.shape[2] / frame_count
     frame_rate = frame_count / duration
@@ -129,16 +129,34 @@ def animate(masses, pos, vel, times, duration=3, max_frame_rate=60, save_to_path
         f" {pos.shape[2]:,} time steps (one frame every {frame_step:,.1f} steps)"
     )
 
+    # linearly interpolate between time steps to get animation frames
+    anim_pos = np.zeros((len(masses), 2, frame_count))
+    anim_vel = np.zeros((len(masses), 2, frame_count))
+    anim_kin = np.zeros(frame_count)
+    anim_pot = np.zeros(frame_count)
+    anim_tot = np.zeros(frame_count)
+
+    for frame_idx in range(frame_count):
+        time = frame_idx * frame_step
+        lower_idx = int(time)
+        f = time - lower_idx
+
+        anim_pos[:, :, frame_idx] = pos[:, :, lower_idx] * (1 - f) + pos[:, :, lower_idx + 1] * f
+        anim_vel[:, :, frame_idx] = vel[:, :, lower_idx] * (1 - f) + vel[:, :, lower_idx + 1] * f
+        anim_kin[frame_idx] = kin_energy[lower_idx] * (1 - f) + kin_energy[lower_idx + 1] * f
+        anim_pot[frame_idx] = pot_energy[lower_idx] * (1 - f) + pot_energy[lower_idx + 1] * f
+        anim_tot[frame_idx] = tot_energy[lower_idx] * (1 - f) + tot_energy[lower_idx + 1] * f
+
     def get_frame(frame_idx):
         time_idx = int(frame_idx * frame_step)
 
         # update bodies
         for mass_idx, body in enumerate(bodies):
-            body.set_data(pos[mass_idx, :, time_idx])
+            body.set_data(anim_pos[mass_idx, :, frame_idx])
 
         # update energy plots
-        for point, energy in zip(energy_points, (kin_energy, pot_energy, tot_energy)):
-            point.set_data(times[time_idx], energy[time_idx])
+        for point, energy in zip(energy_points, (anim_kin, anim_pot, anim_tot)):
+            point.set_data(frame_idx / frame_count, energy[frame_idx])
 
         return bodies + energy_points
 
