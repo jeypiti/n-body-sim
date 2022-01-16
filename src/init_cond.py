@@ -162,7 +162,7 @@ three_body_periodic2 = (
 # Xiaoming Li, Shijun Liao. "Collisionless periodic
 # orbits in the free-fall three body problem". 2018.
 free_fall_periodic1 = (
-    np.array((1.0, .8, .8)),
+    np.array((1.0, 0.8, 0.8)),
     np.array(
         (
             (-0.5, 0.0),
@@ -180,7 +180,7 @@ free_fall_periodic1 = (
 )
 
 free_fall_periodic2 = (
-    np.array((1.0, .8, .4)),
+    np.array((1.0, 0.8, 0.4)),
     np.array(
         (
             (-0.5, 0.0),
