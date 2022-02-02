@@ -69,7 +69,7 @@ def leapfrog(masses, pos, vel, dt, acc):
 
 
 @solver
-def perfl(masses, pos, vel, dt, acc):
+def pefrl(masses, pos, vel, dt, acc):
     """
     Solves N body simulation using the position extended Forest-Ruth-like
     integrator described by:
