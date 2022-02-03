@@ -30,7 +30,7 @@ __license__ = "MIT"
 seed = 1234567890
 
 
-def time_simulation(acc_func, num_bodies, number=100):
+def time_simulation(acc_func, num_bodies, number=10):
     assert isinstance(number, int), "number must be an integer"
 
     masses, pos, _ = generate_planetary_system(num_bodies, seed=seed)
@@ -64,6 +64,9 @@ def test_acc(bodies_upper, steps=10):
     for i, func in enumerate(("Direct sum", "Vec. direct sum", "Barnes-Hut")):
         times = result[len(bodies) * i : len(bodies) * (i + 1)]
         plt.scatter(bodies, times, label=func)
+
+    plt.xlabel(r"$n$")
+    plt.ylabel(r"$t\,/\,\mathrm{s}$")
 
     plt.legend()
     plt.show()
